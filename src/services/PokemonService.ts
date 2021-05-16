@@ -5,7 +5,6 @@ export interface IPokemonList {
   results: {
     id: number;
     name: string;
-    sprite: string;
   }[];
 }
 
@@ -56,20 +55,10 @@ export default class PokemonService {
       `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
     );
 
-    for (let i = 0; i < data.results.length; i++) {
-      try {
-        const pokemon = await this.getPokemon(offset + i + 1);
-        data.results[i].sprite = pokemon.sprites.front_default;
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
     return {
       ...data,
       count: 151,
       results: data.results
-        .filter((r) => r.sprite)
         .map((r, i) => {
           return { ...r, id: offset + i + 1 };
         })

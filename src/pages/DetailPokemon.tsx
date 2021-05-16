@@ -1,5 +1,4 @@
-import { render } from "@testing-library/react";
-import { Badge, Card, Spin, Table, Tag } from "antd";
+import { Card, Spin, Table, Tag } from "antd";
 import Avatar from "antd/lib/avatar/avatar";
 import Meta from "antd/lib/card/Meta";
 import React, { useContext, useEffect, useState } from "react";
@@ -26,7 +25,7 @@ const DetailPokemon = () => {
       pageHeaderContext?.setSubTitle(`#${id} ${result.name}`);
       setPokemon(result);
     });
-  }, []);
+  }, [history, id, pageHeaderContext, pokemon]);
 
   if (!pokemon) {
     return (

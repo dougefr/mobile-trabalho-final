@@ -17,6 +17,9 @@ const ListPokemon = () => {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [sprites, setSprites] = useState<{
+    [key: string]: string;
+  }>({});
   const refToScroll = useRef<HTMLDivElement>(null);
 
   const pageHeaderContext = useContext(PageHeaderContext);
@@ -50,10 +53,22 @@ const ListPokemon = () => {
   }, [page, loading, hasMore]);
 
   useEffect(() => {
-    if (!hasMore && !loading && goto && refToScroll.current) {
-      refToScroll.current!.scrollIntoView();
+    if (!hasMore && !loading) {
+      if (goto && refToScroll.current) {
+        refToScroll.current!.scrollIntoView();
+      }
+
+      pokemons.results.forEach((_, i) => {
+        setTimeout(() => {
+          PokemonService.getPokemon(i).then((p) =>
+            setSprites((s) => {
+              return { ...s, ["" + i]: p.sprites.front_default };
+            })
+          );
+        }, i * 500);
+      });
     }
-  }, [hasMore, loading, goto]);
+  }, [hasMore, loading, goto, pokemons.results]);
 
   if (loading || hasMore) {
     return (
@@ -75,12 +90,16 @@ const ListPokemon = () => {
         >
           <List.Item.Meta
             avatar={
-              <Avatar
-                src={item.sprite}
-                style={{
-                  marginLeft: "1rem",
-                }}
-              />
+              sprites["" + item.id] ? (
+                <Avatar
+                  src={sprites["" + item.id]}
+                  style={{
+                    marginLeft: "1rem",
+                  }}
+                />
+              ) : (
+                <Spin style={{ marginLeft: 16 }} />
+              )
             }
             style={{ cursor: "pointer" }}
             description={`#${item.id}`}
